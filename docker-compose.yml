@@ -1,6 +1,7 @@
 version: '3.8'
 services :
   fast_api:
+    restart: always
     env_file:
       - ./.env
     build:
@@ -10,9 +11,12 @@ services :
       - "${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}"
     depends_on:
       - click_house_server
+      - redis_cache
     links:
       - click_house_server
+      - redis_cache
   click_house_server:
+   restart: always
    image: yandex/clickhouse-server
    ports:
    - "${CLICK_HOUSE_PORT}:${CLICK_HOUSE_PORT}"
@@ -22,3 +26,9 @@ services :
     nofile:
      soft: 262144
      hard: 262144
+  redis_cache:
+   image: redis:6.2-alpine
+   restart: always
+   ports:
+    - "${REDIS_PORT}:${REDIS_PORT}"
+   command: redis-server --save 20 1 --loglevel warning

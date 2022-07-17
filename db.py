@@ -117,23 +117,6 @@ class ClickHouse:
         return False
 
 
-    @classmethod
-    async def check_connection_to_click_house(cls) -> bool:
-        """ check click house is alive
-
-        Returns:
-            bool: flag_connected
-        """
-        try:
-            conn = await cls.conn()
-            flag_connected = conn.connected
-            await conn.close()
-            return flag_connected
-        except Exception as e:
-            print(e, flush=True)
-            return False
-
-
 
 
 

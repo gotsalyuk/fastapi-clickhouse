@@ -1,21 +1,75 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, File
+from apps.csv_to_db import csv_to_db
+from apps.drop_data import drop_data
+from apps.group_csv_from_db import get_grouped_file
 from urls import Urls
-from db import ClickHouse
 
 
 api_router = APIRouter()
 
 
-@api_router.get(Urls.health_check)
-async def health_check():
-    """ check health 
+@api_router.post(Urls.import_csv)
+async def import_csv(file: bytes = File()):
     """
-    click_house_connected = await ClickHouse.check_connection_to_click_house()
 
-    if click_house_connected:
-        return Response(status_code=200)
-    
-    else:
-        details = "click house not connected"
+        upload csv
 
-    raise HTTPException(status_code=503, detail=details)
+        Args:
+
+            file (bytes):
+
+        Returns:
+
+            dict: result
+        """
+    result = await csv_to_db(file=file)
+    if result.get("ok") is True:
+        return result
+    raise HTTPException(status_code=503, detail=result)
+
+
+@api_router.get(Urls.group_data)
+async def group_data(file_id: str, group_fields: str = None):
+    """
+
+        sorted file
+
+        Args:
+
+            file_id (str): file_id
+            group_fields (str): field1,field2,field3
+
+        Returns:
+
+            list: result dicts
+        """
+    result = await get_grouped_file(file_id=file_id, group_fields=group_fields)
+    if result.get("ok") is True:
+        return result
+
+    raise HTTPException(status_code=503, detail=result)
+
+
+@api_router.get(Urls.drop_file)
+async def drop_file(file_id: str):
+    """
+
+        delete file and drop all reference tables
+
+        Args:
+
+            file_id (str): file_id
+
+        Returns:
+
+            dict: result
+    """
+    result = await drop_data(file_id=file_id)
+    if result.get("ok") is True:
+        return result
+    raise HTTPException(status_code=503, detail=result)
+
+
+
+
+
