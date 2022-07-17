@@ -38,7 +38,7 @@ async def csv_to_db(file: bytes) -> dict:
     count_lists_to_insert = (len(data_frame.values) / 1000) - 1
     offset_from = 1
 
-    if count_lists_to_insert >= 1000:
+    if count_lists_to_insert >= 1:
         count_lists_checked = 0
         offset_to = offset_from + 999
         while count_lists_checked < count_lists_to_insert:
