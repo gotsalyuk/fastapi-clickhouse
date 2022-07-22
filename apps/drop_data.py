@@ -32,4 +32,7 @@ async def drop_data(file_id: str) -> dict:
 
     await gather(*tasks)
 
+    if not table_exists:
+        return {"ok": False, "message": f"table {file_id} not exists"}
+
     return {"ok": True, "message": file_id}
